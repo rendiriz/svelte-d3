@@ -33,21 +33,24 @@ function serve() {
 export default {
 	input: 'src/main.ts',
 	output: [
-		{
-			sourcemap: true,
-			format: 'cjs',
-			file: 'public/build/d3.cjs.js'
-		},
-		{
-			sourcemap: true,
-			format: 'esm',
-			file: 'public/build/d3.esm.js'
-		},
+		// {
+		// 	sourcemap: true,
+		// 	format: 'cjs',
+		// 	file: 'public/build/d3.cjs.js'
+		// },
+		// {
+		// 	sourcemap: true,
+		// 	format: 'esm',
+		// 	file: 'public/build/d3.esm.js'
+		// },
 		{
 			sourcemap: true,
 			format: 'umd',
 			name: 'svelte-d3',
-			file: 'public/build/d3.umd.js'
+			file: 'public/build/d3.umd.js',
+			globals: {
+        d3: 'd3'
+    	},
 		}
 	],
 	plugins: [
@@ -76,9 +79,22 @@ export default {
 		// https://github.com/rollup/plugins/tree/master/packages/commonjs
 		resolve({
 			browser: true,
-			dedupe: ['svelte']
+			dedupe: ['svelte'],
+			jsnext: true
 		}),
-		commonjs(),
+		commonjs({
+			include: 'node_modules/**',
+			extensions: [ '.js', '.coffee' ],
+			namedExports: {
+        'node_modules/d3/dist/d3.node.js': [
+          'selection', 'mouse', 'select', 'interpolateRgbBasis',
+          'median', 'min', 'max', 'scaleLinear', 'easeExp', 'extent', 'event',
+          'easeSin', 'selectAll', 'keys', 'interpolateRgb', 'descending', 'line',
+          'curveBasis', 'histogram', 'ascending', 'sourceEvent'
+        ],
+			},
+			ignore: [ 'conditional-runtime-dependency' ]
+		}),
 		typescript({
 			// sourceMap: !production,
 			// inlineSources: !production,
